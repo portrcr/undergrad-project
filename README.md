@@ -3,14 +3,6 @@
 > **Undergraduate Degree Final Year Project** &middot; Zetech University  
 > Built with **Django 6.0**, **Python 3.10+**, **SQLite**, and modern responsive CSS/JavaScript.
 
----
-
-## 📌 Quick Navigation (Collapsible Sections)
-
-*Click on any section below to expand or collapse its details.*
-
----
-
 <details open>
 <summary><h3>📖 1. Project Overview</h3></summary>
 
