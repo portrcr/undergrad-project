@@ -30,3 +30,4 @@ echo "Setting up RBAC roles (Admin/Staff/Student groups)..."
 echo ""
 echo "Starting development server at http://127.0.0.1:8000/ (Ctrl+C to stop)"
 "$PY" manage.py runserver
+

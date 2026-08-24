@@ -59,3 +59,4 @@ echo.
 echo Something went wrong ^(see above^). Aborting.
 pause
 exit /b 1
+
