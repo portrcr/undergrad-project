@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile | Hostel Booking{% endblock %}
+
+{% block content %}
+    <div class="profile-header">
+        <div class="avatar">{{ user.username|slice:":1"|upper }}</div>
+        <div>
+            <h1>{{ user.first_name|default:user.username }}</h1>
+            <p class="profile-meta">
+                @{{ user.username }} &middot; {{ user.email|default:"No email set" }}
+                {% if user.profile.role %} &middot; <span class="tag tag-available">{{ user.profile.role }}</span>{% endif %}
+            </p>
+        </div>
+    </div>
+
+    <div class="auth-card">
+        <h2>Edit Details</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn">Save</button>
+        </form>
+    </div>
+
+    {% if bookings is not None %}
+        <h2>📋 Booking History</h2>
+        {% if bookings %}
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead><tr><th>Room</th><th>Term</th><th>Status</th><th>Requested</th><th></th></tr></thead>
+                    <tbody>
+                        {% for booking in bookings %}
+                            <tr>
+                                <td>{{ booking.room }}</td>
+                                <td>{{ booking.term }}</td>
+                                <td><span class="tag tag-{{ booking.status }}">{{ booking.get_status_display }}</span></td>
+                                <td>{{ booking.date_requested|date:"d M Y, H:i" }}</td>
+                                <td>
+                                    {% if booking.status == 'pending' %}
+                                        <form action="{% url 'bookings:cancel_booking' booking.id %}" method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-secondary">Cancel</button>
+                                        </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <p>You have no bookings yet.</p>
+                <p><a class="btn" href="{% url 'hostels:room_list' %}">Browse rooms</a></p>
+            </div>
+        {% endif %}
+    {% endif %}
+{% endblock %}

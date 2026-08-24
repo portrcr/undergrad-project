@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete {{ term.name }} | Hostel Booking{% endblock %}
+
+{% block content %}
+    <div class="auth-card">
+        <h1>⚠️ Delete {{ term.name }}?</h1>
+        <p>
+            {% if booking_count or recommendation_count %}
+                This will also delete {{ booking_count }} booking record{{ booking_count|pluralize }}
+                and {{ recommendation_count }} recommendation record{{ recommendation_count|pluralize }} tied to this term.
+            {% endif %}
+            This cannot be undone.
+        </p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Yes, delete it</button>
+            <a class="btn btn-secondary" href="{% url 'hostels:manage_terms' %}">Cancel</a>
+        </form>
+    </div>
+{% endblock %}

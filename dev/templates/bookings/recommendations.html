@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Recommended Rooms | Hostel Booking{% endblock %}
+
+{% block content %}
+    <h1>🤖 Recommended For You</h1>
+    <p>Ranked by fit with your budget, location and lifestyle preferences{% if term %} for <strong>{{ term.name }}</strong>{% endif %}.
+        <a href="{% url 'edit_preferences' %}">Update my preferences</a></p>
+
+    {% if already_booked %}
+        <p class="message message-pending">You already have an active booking request this term &mdash;
+            see <a href="{% url 'profile' %}">My Profile</a>.</p>
+    {% endif %}
+
+    {% if ranked %}
+        <div class="room-grid">
+            {% for room, score in ranked %}
+                <div class="room-card{% if forloop.first %} room-card-best{% endif %}">
+                    {% if forloop.first %}<div class="room-card-ribbon">🏆 Best Match</div>{% endif %}
+                    <div class="room-card-header">
+                        <span class="room-card-hostel">{{ room.hostel.name }}</span>
+                        <span class="room-card-number">{{ room.room_number }}</span>
+                    </div>
+                    <div class="room-card-body">
+                        <div class="room-price">KES {{ room.price_per_term|floatformat:0|intcomma }}<span class="room-price-unit">/ term</span></div>
+                        <div class="match-score">
+                            <div class="match-score-bar"><div class="match-score-fill" style="width: {% widthratio score.overall 1 100 %}%"></div></div>
+                            <strong>{% widthratio score.overall 1 100 %}% overall match</strong>
+                        </div>
+                        <div class="room-card-facts">
+                            {% if room.has_private_bathroom %}<span class="fact">🚿 Private bathroom</span>{% endif %}
+                            <span class="fact">
+                                {% if score.compatibility is not None %}🤝 Roommate Fit {% widthratio score.compatibility 1 100 %}%{% else %}🤝 Roommate Fit: New room{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="room-card-footer">
+                        {% if not already_booked %}
+                            <form action="{% url 'bookings:request_booking' room.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-block">Request Room</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <p>No suitable rooms found right now &mdash; check back later or browse all rooms.</p>
+            <p><a class="btn" href="{% url 'hostels:room_list' %}">Browse all rooms</a></p>
+        </div>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard | Hostel Booking{% endblock %}
+
+{% block content %}
+    <h1>🧭 Staff Dashboard</h1>
+    <p>{% if term %}Snapshot for <strong>{{ term.name }}</strong>.{% else %}No active term right now.{% endif %}</p>
+
+    <div class="stat-grid">
+        <a class="stat-tile stat-tile-highlight" href="{% url 'bookings:pending_bookings' %}">
+            <span class="stat-value">{{ pending_count }}</span>
+            <span class="stat-label">Pending Requests</span>
+        </a>
+        <a class="stat-tile" href="{% url 'hostels:room_list' %}">
+            <span class="stat-value">{{ available_rooms }}/{{ total_rooms }}</span>
+            <span class="stat-label">Rooms Available</span>
+        </a>
+        <div class="stat-tile">
+            <span class="stat-value">{{ confirmed_this_term }}</span>
+            <span class="stat-label">Confirmed Bookings</span>
+        </div>
+        <a class="stat-tile" href="{% url 'bookings:recommendation_insights' %}">
+            <span class="stat-value">{% if acceptance_rate is not None %}{{ acceptance_rate }}%{% else %}&mdash;{% endif %}</span>
+            <span class="stat-label">Recommendation Acceptance</span>
+        </a>
+    </div>
+
+    <h2>Quick Links</h2>
+    <div class="card-grid">
+        <a class="card" href="{% url 'bookings:pending_bookings' %}">
+            <div class="card-icon">✅</div>
+            <h2>Pending Requests</h2>
+            <p>{{ pending_count }} request{{ pending_count|pluralize }} awaiting review.</p>
+        </a>
+        <a class="card" href="{% url 'bookings:demand_forecast' %}">
+            <div class="card-icon">📈</div>
+            <h2>Demand Forecast</h2>
+            <p>{{ rising_count }} of {{ forecasts_count }} hostel{{ forecasts_count|pluralize }} trending up.</p>
+        </a>
+        <a class="card" href="{% url 'bookings:recommendation_insights' %}">
+            <div class="card-icon">📊</div>
+            <h2>Recommendation Insights</h2>
+            <p>{% if acceptance_rate is not None %}{{ acceptance_rate }}% acceptance rate.{% else %}No data yet.{% endif %}</p>
+        </a>
+        {% if perms.hostels.change_hostel %}
+            <a class="card" href="{% url 'hostels:manage_hostels' %}">
+                <div class="card-icon">🏢</div>
+                <h2>Manage Hostels</h2>
+                <p>Add, edit or remove hostels and their rooms.</p>
+            </a>
+        {% endif %}
+        {% if perms.hostels.change_term %}
+            <a class="card" href="{% url 'hostels:manage_terms' %}">
+                <div class="card-icon">🗓️</div>
+                <h2>Manage Terms</h2>
+                <p>Open new academic terms for booking.</p>
+            </a>
+        {% endif %}
+    </div>
+{% endblock %}

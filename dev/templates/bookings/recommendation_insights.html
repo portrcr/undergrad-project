@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Recommendation Insights | Hostel Booking{% endblock %}
+
+{% block content %}
+    <h1>📊 Recommendation Insights</h1>
+    <p>How often students book the rooms the AI recommender suggests to them.</p>
+
+    <div class="stat-grid">
+        <div class="stat-tile">
+            <span class="stat-value">{{ stats.total_shown }}</span>
+            <span class="stat-label">Recommendations shown</span>
+        </div>
+        <div class="stat-tile">
+            <span class="stat-value">{{ stats.accepted_count }}</span>
+            <span class="stat-label">Accepted</span>
+        </div>
+        <div class="stat-tile">
+            <span class="stat-value">{{ stats.declined_count }}</span>
+            <span class="stat-label">Declined</span>
+        </div>
+        <div class="stat-tile stat-tile-highlight">
+            <span class="stat-value">{% if stats.acceptance_rate is not None %}{{ stats.acceptance_rate }}%{% else %}&mdash;{% endif %}</span>
+            <span class="stat-label">Acceptance rate</span>
+        </div>
+    </div>
+
+    {% if stats.unresolved_count %}
+        <p class="message message-pending">{{ stats.unresolved_count }} recommendation{{ stats.unresolved_count|pluralize }}
+            shown but not yet resolved &mdash; the student hasn't submitted a booking request this term yet.</p>
+    {% endif %}
+
+    {% if stats.avg_accepted_score is not None and stats.avg_declined_score is not None %}
+        <p>
+            Average match score of <strong>accepted</strong> recommendations:
+            <strong>{% widthratio stats.avg_accepted_score 1 100 %}%</strong> &mdash;
+            <strong>declined</strong>: <strong>{% widthratio stats.avg_declined_score 1 100 %}%</strong>.
+            {% if stats.avg_accepted_score > stats.avg_declined_score %}
+                Higher-scored recommendations are being accepted more often, which suggests the scoring is working as intended.
+            {% else %}
+                Accepted and declined scores are close, or declined recommendations scored higher &mdash;
+                worth revisiting the scoring weights once there's more data.
+            {% endif %}
+        </p>
+    {% endif %}
+
+    <h2>By Term</h2>
+    {% if stats.per_term %}
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead><tr><th>Term</th><th>Shown</th><th>Accepted</th><th>Declined</th><th>Rate</th></tr></thead>
+                <tbody>
+                    {% for row in stats.per_term %}
+                        <tr>
+                            <td>{{ row.term.name }}</td>
+                            <td>{{ row.shown }}</td>
+                            <td>{{ row.accepted }}</td>
+                            <td>{{ row.declined }}</td>
+                            <td>
+                                {% if row.rate is not None %}
+                                    <span class="meter"><span class="meter-bar" style="width: {{ row.rate }}%"></span></span>
+                                    {{ row.rate }}%
+                                {% else %}
+                                    &mdash;
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <p>No recommendations have been shown yet &mdash; they're logged automatically when a student views their Recommended Rooms page.</p>
+        </div>
+    {% endif %}
+{% endblock %}

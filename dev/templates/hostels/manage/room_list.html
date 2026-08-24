@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Manage Rooms - {{ hostel.name }} | Hostel Booking{% endblock %}
+
+{% block breadcrumbs %}
+    <nav aria-label="Breadcrumb">
+        <ol class="breadcrumb">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'hostels:manage_hostels' %}">Manage Hostels</a></li>
+            <li><span aria-current="page">{{ hostel.name }}</span></li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <h1>🛏️ {{ hostel.name }} &mdash; Rooms</h1>
+    <p><a class="btn" href="{% url 'hostels:room_create' hostel.id %}">+ Add Room</a></p>
+
+    {% if rooms %}
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead><tr><th>Room</th><th>Capacity</th><th>Price / term</th><th>Status</th><th></th></tr></thead>
+                <tbody>
+                    {% for room in rooms %}
+                        <tr>
+                            <td>{{ room.room_number }}{% if room.has_private_bathroom %} <span title="Private bathroom">🚿</span>{% endif %}</td>
+                            <td>{{ room.capacity }}</td>
+                            <td>KES {{ room.price_per_term|floatformat:0|intcomma }}</td>
+                            <td><span class="tag tag-{{ room.status }}">{{ room.get_status_display }}</span></td>
+                            <td>
+                                <a class="btn btn-secondary" href="{% url 'hostels:room_edit' room.id %}">Edit</a>
+                                <a class="btn btn-danger" href="{% url 'hostels:room_delete' room.id %}">Delete</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <p>No rooms yet for this hostel &mdash; add one to get started.</p>
+        </div>
+    {% endif %}
+{% endblock %}

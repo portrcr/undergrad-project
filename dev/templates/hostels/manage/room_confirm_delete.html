@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete {{ room }} | Hostel Booking{% endblock %}
+
+{% block content %}
+    <div class="auth-card">
+        <h1>⚠️ Delete {{ room }}?</h1>
+        <p>
+            {% if booking_count %}This room has {{ booking_count }} booking record{{ booking_count|pluralize }} tied to it, which will also be deleted. {% endif %}
+            This cannot be undone.
+        </p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Yes, delete it</button>
+            <a class="btn btn-secondary" href="{% url 'hostels:manage_rooms' room.hostel_id %}">Cancel</a>
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}My Preferences | Hostel Booking{% endblock %}
+
+{% block content %}
+    <div class="auth-card">
+        <h1>🎯 My Preferences</h1>
+        <p>Tell us your budget and lifestyle so we can recommend the best-fit rooms.</p>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn">Save Preferences</button>
+        </form>
+    </div>
+{% endblock %}

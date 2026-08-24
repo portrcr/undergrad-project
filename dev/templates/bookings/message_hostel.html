@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Message {{ hostel.name }} | Hostel Booking{% endblock %}
+
+{% block breadcrumbs %}
+    <nav aria-label="Breadcrumb">
+        <ol class="breadcrumb">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'bookings:message_hostel_list' %}">Message a Hostel</a></li>
+            <li><span aria-current="page">{{ hostel.name }}</span></li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <div class="auth-card">
+        <h1>📢 Message {{ hostel.name }}</h1>
+        <p>{{ occupant_count }} student{{ occupant_count|pluralize }} currently confirmed{% if term %} for {{ term.name }}{% endif %}.</p>
+
+        {% if occupant_count %}
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn">Send to All</button>
+            </form>
+        {% else %}
+            <div class="empty-state">
+                <p>No students currently confirmed in {{ hostel.name }} this term.</p>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Demand Forecast | Hostel Booking{% endblock %}
+
+{% block content %}
+    <h1>📈 Demand Forecast</h1>
+    <p>Predicted booking demand for next term, per hostel &mdash; a simple trend line fitted over
+       <strong>completed</strong> terms' active bookings. A term still in progress is shown for
+       reference but left out of the trend, since it is still taking bookings.</p>
+
+    {% if forecasts %}
+        <div class="card-grid">
+            {% for forecast in forecasts %}
+                <div class="card forecast-card">
+                    <h2>{{ forecast.hostel.name }}</h2>
+                    <table class="data-table">
+                        <thead><tr><th>Term</th><th>Demand</th></tr></thead>
+                        <tbody>
+                            {% for point in forecast.history %}
+                                <tr>
+                                    <td>
+                                        {{ point.term.name }}
+                                        {% if not point.complete %}<span class="tag tag-pending">in progress</span>{% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="meter"><span class="meter-bar" style="width: {% widthratio point.count forecast.max_count 100 %}%"></span></span>
+                                        {{ point.count }}
+                                        {% if not point.complete %}<span class="forecast-note">excluded</span>{% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            <tr class="predicted-row">
+                                <td>Next term (predicted)</td>
+                                <td>
+                                    <span class="meter"><span class="meter-bar meter-predicted" style="width: {% widthratio forecast.predicted_count forecast.max_count 100 %}%"></span></span>
+                                    <strong>{{ forecast.predicted_count }}</strong>
+                                    <span class="tag tag-{{ forecast.trend }}">{{ forecast.trend }}</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <p>Not enough term history yet to forecast demand &mdash; add at least two terms with bookings.</p>
+        </div>
+    {% endif %}
+{% endblock %}

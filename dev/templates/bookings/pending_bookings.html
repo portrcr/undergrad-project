@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Pending Requests | Hostel Booking{% endblock %}
+
+{% block content %}
+    <h1>✅ Pending Booking Requests</h1>
+    {% if bookings %}
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Student</th><th>Room</th><th>Term</th><th>Requested</th><th></th></tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                        <tr>
+                            <td>{{ booking.student.username }}</td>
+                            <td>{{ booking.room }}</td>
+                            <td>{{ booking.term }}</td>
+                            <td>{{ booking.date_requested|date:"d M Y, H:i" }}</td>
+                            <td>
+                                <form action="{% url 'bookings:approve_booking' booking.id %}" method="post" class="inline-form">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn">Approve</button>
+                                </form>
+                                <form action="{% url 'bookings:reject_booking' booking.id %}" method="post" class="inline-form">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-secondary">Reject</button>
+                                </form>
+                                <a class="btn btn-secondary" href="{% url 'bookings:message_student' booking.id %}">Message</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <p>No pending booking requests right now.</p>
+        </div>
+    {% endif %}
+{% endblock %}

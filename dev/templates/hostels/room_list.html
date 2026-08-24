@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Rooms | Hostel Booking{% endblock %}
+
+{% block content %}
+    <h1>🛏️ {% if hostel_filter %}{{ hostel_filter.name }} &mdash; Rooms{% else %}Available Rooms{% endif %}</h1>
+    {% if hostel_filter %}
+        <p><a href="{% url 'hostels:room_list' %}">&larr; All hostels</a>{% if term %} &middot; Showing availability for <strong>{{ term.name }}</strong>{% endif %}</p>
+    {% elif term %}
+        <p>Showing availability for <strong>{{ term.name }}</strong>.</p>
+    {% endif %}
+
+    {% if is_student and already_booked %}
+        <p class="message message-pending">You already have an active booking request for this term &mdash;
+            see <a href="{% url 'profile' %}">My Profile</a>.</p>
+    {% elif is_student and term and not show_roommate_fit %}
+        <p class="message message-pending"><a href="{% url 'edit_preferences' %}">Set your preferences</a>
+            to see your roommate compatibility fit for each room.</p>
+    {% endif %}
+
+    {% if rooms %}
+        <div class="room-grid">
+            {% for room in rooms %}
+                <div class="room-card{% if room.available_beds <= 0 %} room-card-full{% endif %}">
+                    <div class="room-card-header">
+                        <span class="room-card-hostel">{{ room.hostel.name }}</span>
+                        <span class="room-card-number">{{ room.room_number }}</span>
+                    </div>
+                    <div class="room-card-body">
+                        <div class="room-price">KES {{ room.price_per_term|floatformat:0|intcomma }}<span class="room-price-unit">/ term</span></div>
+                        <div class="room-card-facts">
+                            <span class="fact">🛏️ {{ room.capacity }} bed{{ room.capacity|pluralize }}</span>
+                            {% if room.has_private_bathroom %}<span class="fact">🚿 Private bathroom</span>{% endif %}
+                        </div>
+                        <div class="room-card-badges">
+                            {% if room.available_beds <= 0 %}
+                                <span class="tag tag-full">Full</span>
+                            {% else %}
+                                <span class="tag tag-available">{{ room.available_beds }} bed{{ room.available_beds|pluralize }} free</span>
+                            {% endif %}
+                            {% if show_roommate_fit %}
+                                {% if room.roommate_fit is not None %}
+                                    <span class="tag tag-available">🤝 Roommate Fit {% widthratio room.roommate_fit 1 100 %}%</span>
+                                {% else %}
+                                    <span class="tag" title="No current occupants to compare against yet">🤝 Roommate Fit: New room</span>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="room-card-footer">
+                        {% if room.available_beds > 0 and is_student and term and not already_booked %}
+                            <form action="{% url 'bookings:request_booking' room.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-block">Request Room</button>
+                            </form>
+                        {% elif room.available_beds <= 0 %}
+                            <span class="room-card-footer-note">No beds available</span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <p>No rooms available right now. Check back once staff add more listings.</p>
+        </div>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications | Hostel Booking{% endblock %}
+
+{% block content %}
+    <h1>🔔 Notifications</h1>
+
+    {% if notifications %}
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead><tr><th></th><th>From</th><th>Message</th><th>When</th></tr></thead>
+                <tbody>
+                    {% for note in notifications %}
+                        <tr class="{% if not note.is_read %}notification-unread{% endif %}">
+                            <td>{% if not note.is_read %}<span class="tag tag-pending">New</span>{% endif %}</td>
+                            <td>{% if note.sender %}{{ note.sender.username }}{% else %}<em>System</em>{% endif %}</td>
+                            <td>{{ note.message }}</td>
+                            <td>{{ note.created_at|date:"d M Y, H:i" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <p>No notifications yet &mdash; you'll see updates here when staff review your booking requests.</p>
+        </div>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Terms | Hostel Booking{% endblock %}
+
+{% block content %}
+    <h1>🗓️ Manage Terms</h1>
+    <p><a class="btn" href="{% url 'hostels:term_create' %}">+ Add Term</a></p>
+
+    {% if terms %}
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead><tr><th>#</th><th>Name</th><th>Start</th><th>End</th><th></th></tr></thead>
+                <tbody>
+                    {% for term in terms %}
+                        <tr{% if term == current_term %} class="predicted-row"{% endif %}>
+                            <td>{{ term.sequence_number }}</td>
+                            <td>{{ term.name }}{% if term == current_term %} <span class="tag tag-available">Current</span>{% endif %}</td>
+                            <td>{{ term.start_date }}</td>
+                            <td>{{ term.end_date }}</td>
+                            <td>
+                                <a class="btn btn-secondary" href="{% url 'hostels:term_edit' term.id %}">Edit</a>
+                                <a class="btn btn-danger" href="{% url 'hostels:term_delete' term.id %}">Delete</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <p>No terms yet &mdash; add one to open booking.</p>
+        </div>
+    {% endif %}
+{% endblock %}

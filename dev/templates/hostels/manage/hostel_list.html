@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Hostels | Hostel Booking{% endblock %}
+
+{% block content %}
+    <h1>🏢 Manage Hostels</h1>
+    <p><a class="btn" href="{% url 'hostels:hostel_create' %}">+ Add Hostel</a></p>
+
+    {% if hostels %}
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead><tr><th>Photo</th><th>Name</th><th>Location</th><th>Rooms</th><th></th></tr></thead>
+                <tbody>
+                    {% for hostel in hostels %}
+                        <tr>
+                            <td>
+                                {% if hostel.image %}
+                                    <img src="{{ hostel.image.url }}" alt="{{ hostel.name }}" style="width:56px;height:40px;object-fit:cover;border-radius:6px;">
+                                {% else %}
+                                    <span class="tag">No photo</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ hostel.name }}</td>
+                            <td>{{ hostel.location }}</td>
+                            <td><a href="{% url 'hostels:manage_rooms' hostel.id %}">{{ hostel.rooms.count }} room{{ hostel.rooms.count|pluralize }}</a></td>
+                            <td>
+                                <a class="btn btn-secondary" href="{% url 'hostels:hostel_edit' hostel.id %}">Edit</a>
+                                <a class="btn btn-danger" href="{% url 'hostels:hostel_delete' hostel.id %}">Delete</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <p>No hostels yet &mdash; add one to get started.</p>
+        </div>
+    {% endif %}
+{% endblock %}

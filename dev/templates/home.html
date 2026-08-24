@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Home | Hostel Booking{% endblock %}
+
+{% block content %}
+    <section class="hero">
+        <h1>🏠 AI-Powered Hostel Booking</h1>
+        <p>Find a room that matches your budget, location and lifestyle preferences &mdash; then track your request in one place.</p>
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <span class="hero-stat-value">{{ stats.hostel_count }}</span>
+                <span class="hero-stat-label">Hostels</span>
+            </div>
+            <div class="hero-stat">
+                <span class="hero-stat-value">{{ stats.room_count }}</span>
+                <span class="hero-stat-label">Rooms</span>
+            </div>
+            <div class="hero-stat">
+                <span class="hero-stat-value">{{ stats.housed_count }}</span>
+                <span class="hero-stat-label">Students Housed</span>
+            </div>
+        </div>
+    </section>
+
+    {% if packages %}
+        <h2>Room Packages</h2>
+        <p>Every room type we offer, with the lowest price currently available.</p>
+        <div class="package-grid">
+            {% for package in packages %}
+                <a class="package-card" href="{% url 'hostels:room_list' %}">
+                    <div class="package-icon">{{ package.icon }}</div>
+                    <h3>{{ package.label }}</h3>
+                    <div class="package-price">KES {{ package.min_price|floatformat:0|intcomma }}<small>per term, from</small></div>
+                </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="feature-strip">
+        <div class="feature-item">
+            <div class="feature-icon">🔒</div>
+            <h4>Role-Based Security</h4>
+            <p>Students, staff and admins each see exactly what their role allows.</p>
+        </div>
+        <div class="feature-item">
+            <div class="feature-icon">🤖</div>
+            <h4>AI-Matched Rooms</h4>
+            <p>Recommendations ranked by your budget, location and lifestyle fit.</p>
+        </div>
+        <div class="feature-item">
+            <div class="feature-icon">🤝</div>
+            <h4>Roommate Compatibility</h4>
+            <p>See how well you'd fit with a room's current occupants before you book.</p>
+        </div>
+        <div class="feature-item">
+            <div class="feature-icon">🔔</div>
+            <h4>Instant Notifications</h4>
+            <p>Know the moment staff approve, reject, or message you about a booking.</p>
+        </div>
+    </div>
+
+    {% if user.is_authenticated %}
+        <p>Welcome back, <strong>{{ user.first_name|default:user.username }}</strong>{% if user.profile.role %} &mdash; you're signed in as <strong>{{ user.profile.role }}</strong>{% endif %}.</p>
+
+        <div class="card-grid">
+            <a class="card" href="{% url 'hostels:hostel_browse' %}">
+                <div class="card-icon">🏨</div>
+                <h2>Browse Hostels</h2>
+                <p>See every hostel, with photos, pricing and room counts.</p>
+            </a>
+            <a class="card" href="{% url 'hostels:room_list' %}">
+                <div class="card-icon">🛏️</div>
+                <h2>Browse Rooms</h2>
+                <p>See which rooms are open for the current term.</p>
+            </a>
+            {% if is_student %}
+                <a class="card" href="{% url 'bookings:recommendations' %}">
+                    <div class="card-icon">🤖</div>
+                    <h2>Recommended For You</h2>
+                    <p>Rooms ranked by your budget, location and lifestyle fit.</p>
+                </a>
+                <a class="card" href="{% url 'edit_preferences' %}">
+                    <div class="card-icon">🎯</div>
+                    <h2>My Preferences</h2>
+                    <p>Set your budget and lifestyle to improve recommendations.</p>
+                </a>
+            {% endif %}
+            <a class="card" href="{% url 'profile' %}">
+                <div class="card-icon">👤</div>
+                <h2>My Profile</h2>
+                <p>Your account details and full booking history.</p>
+            </a>
+            {% if perms.bookings.change_booking %}
+                <a class="card" href="{% url 'bookings:dashboard' %}">
+                    <div class="card-icon">🧭</div>
+                    <h2>Dashboard</h2>
+                    <p>At-a-glance stats across the whole system.</p>
+                </a>
+                <a class="card" href="{% url 'bookings:pending_bookings' %}">
+                    <div class="card-icon">✅</div>
+                    <h2>Pending Requests</h2>
+                    <p>Approve or reject student booking requests.</p>
+                </a>
+                <a class="card" href="{% url 'bookings:demand_forecast' %}">
+                    <div class="card-icon">📈</div>
+                    <h2>Demand Forecast</h2>
+                    <p>Predicted next-term demand per hostel.</p>
+                </a>
+                <a class="card" href="{% url 'bookings:recommendation_insights' %}">
+                    <div class="card-icon">📊</div>
+                    <h2>Recommendation Insights</h2>
+                    <p>How often students book what the AI recommends.</p>
+                </a>
+                <a class="card" href="{% url 'bookings:message_hostel_list' %}">
+                    <div class="card-icon">📢</div>
+                    <h2>Message a Hostel</h2>
+                    <p>Announce something to every student confirmed in a hostel.</p>
+                </a>
+            {% endif %}
+            {% if perms.hostels.change_hostel %}
+                <a class="card" href="{% url 'hostels:manage_hostels' %}">
+                    <div class="card-icon">🏢</div>
+                    <h2>Manage Hostels</h2>
+                    <p>Add, edit or remove hostels and their rooms.</p>
+                </a>
+            {% endif %}
+            {% if perms.hostels.change_term %}
+                <a class="card" href="{% url 'hostels:manage_terms' %}">
+                    <div class="card-icon">🗓️</div>
+                    <h2>Manage Terms</h2>
+                    <p>Open new academic terms for booking.</p>
+                </a>
+            {% endif %}
+            {% if user.is_staff %}
+                <a class="card" href="{% url 'admin:index' %}">
+                    <div class="card-icon">⚙️</div>
+                    <h2>Admin</h2>
+                    <p>Manage hostels, rooms, terms and bookings.</p>
+                </a>
+            {% endif %}
+        </div>
+    {% else %}
+        <p><a class="btn" href="{% url 'login' %}">Log in to get started</a></p>
+
+        <div class="steps">
+            <div class="step">
+                <span class="step-number">1</span>
+                <h3>Browse rooms</h3>
+                <p>See what's open for the current term across all hostels.</p>
+            </div>
+            <div class="step">
+                <span class="step-number">2</span>
+                <h3>Request a room</h3>
+                <p>Submit a request for the room that fits you best.</p>
+            </div>
+            <div class="step">
+                <span class="step-number">3</span>
+                <h3>Get approved</h3>
+                <p>Staff review your request and confirm your booking.</p>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

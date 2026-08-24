@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} | Hostel Booking{% endblock %}
+
+{% block breadcrumbs %}
+    <nav aria-label="Breadcrumb">
+        <ol class="breadcrumb">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'hostels:manage_hostels' %}">Manage Hostels</a></li>
+            {% if hostel %}<li><a href="{% url 'hostels:manage_rooms' hostel.id %}">{{ hostel.name }}</a></li>{% endif %}
+            <li><span aria-current="page">{{ title }}</span></li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <div class="auth-card">
+        <h1>🛏️ {{ title }}</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn">Save</button>
+        </form>
+    </div>
+{% endblock %}

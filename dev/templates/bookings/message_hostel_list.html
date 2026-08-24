@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Message a Hostel | Hostel Booking{% endblock %}
+
+{% block content %}
+    <h1>📢 Message a Hostel</h1>
+    <p>Send an announcement to every student currently confirmed in a hostel{% if term %} for <strong>{{ term.name }}</strong>{% endif %}.</p>
+
+    {% if hostels %}
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead><tr><th>Hostel</th><th>Current Occupants</th><th></th></tr></thead>
+                <tbody>
+                    {% for hostel in hostels %}
+                        <tr>
+                            <td>{{ hostel.name }}</td>
+                            <td>{{ hostel.occupant_count }} student{{ hostel.occupant_count|pluralize }}</td>
+                            <td><a class="btn btn-secondary" href="{% url 'bookings:message_hostel' hostel.id %}">Message</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <p>No hostels yet.</p>
+        </div>
+    {% endif %}
+{% endblock %}

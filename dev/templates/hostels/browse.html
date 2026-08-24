@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Hostels | Hostel Booking{% endblock %}
+
+{% block content %}
+    <h1>🏨 Our Hostels</h1>
+    <p>Browse hostels and jump straight to their available rooms{% if term %} for <strong>{{ term.name }}</strong>{% endif %}.</p>
+
+    {% if hostels %}
+        <div class="room-grid">
+            {% for hostel in hostels %}
+                <a class="hostel-card" href="{% url 'hostels:room_list' %}?hostel={{ hostel.id }}">
+                    {% if hostel.image %}
+                        <div class="hostel-card-image" style="background-image: url('{{ hostel.image.url }}');">
+                            {% if hostel.id == most_popular_id %}<span class="hostel-card-popular">🏆 Most Popular</span>{% endif %}
+                        </div>
+                    {% else %}
+                        <div class="hostel-card-placeholder">
+                            🏨
+                            {% if hostel.id == most_popular_id %}<span class="hostel-card-popular">🏆 Most Popular</span>{% endif %}
+                        </div>
+                    {% endif %}
+                    <div class="hostel-card-body">
+                        <h2>{{ hostel.name }}</h2>
+                        {% if hostel.location %}<div class="hostel-card-location">📍 {{ hostel.location }}</div>{% endif %}
+                        {% if hostel.description %}<p class="hostel-card-desc">{{ hostel.description|truncatewords:18 }}</p>{% endif %}
+                    </div>
+                    <div class="hostel-card-footer">
+                        <span>{{ hostel.room_count }} room{{ hostel.room_count|pluralize }}</span>
+                        {% if hostel.min_price %}
+                            <span class="hostel-card-price">
+                                {% if hostel.min_price == hostel.max_price %}
+                                    KES {{ hostel.min_price|floatformat:0|intcomma }}
+                                {% else %}
+                                    From KES {{ hostel.min_price|floatformat:0|intcomma }}
+                                {% endif %}
+                            </span>
+                        {% endif %}
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <p>No hostels have been added yet.</p>
+        </div>
+    {% endif %}
+{% endblock %}

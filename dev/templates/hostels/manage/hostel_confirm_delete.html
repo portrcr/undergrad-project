@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete {{ hostel.name }} | Hostel Booking{% endblock %}
+
+{% block content %}
+    <div class="auth-card">
+        <h1>⚠️ Delete {{ hostel.name }}?</h1>
+        <p>
+            This will permanently delete <strong>{{ hostel.name }}</strong> and its {{ room_count }} room{{ room_count|pluralize }}
+            {% if booking_count %}, along with {{ booking_count }} booking record{{ booking_count|pluralize }} tied to those rooms{% endif %}.
+            This cannot be undone.
+        </p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Yes, delete it</button>
+            <a class="btn btn-secondary" href="{% url 'hostels:manage_hostels' %}">Cancel</a>
+        </form>
+    </div>
+{% endblock %}

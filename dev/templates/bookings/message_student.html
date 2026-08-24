@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Message {{ booking.student.username }} | Hostel Booking{% endblock %}
+
+{% block content %}
+    <div class="auth-card">
+        <h1>✉️ Message {{ booking.student.username }}</h1>
+        <p>About their booking for <strong>{{ booking.room }}</strong> ({{ booking.term }}).</p>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn">Send Message</button>
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,132 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <title>{% block title %}Hostel Booking{% endblock %}</title>
+    <script>document.documentElement.classList.remove('no-js');</script>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%F0%9F%8F%A0</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a class="brand" href="{% url 'home' %}"><span class="brand-icon">🏠</span> Hostel Booking</a>
+
+            {% if user.is_authenticated %}
+                <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Menu">
+                    <span class="nav-toggle-bars"></span>
+                </button>
+            {% endif %}
+
+            <nav id="site-nav" aria-label="Main">
+                {% if user.is_authenticated %}
+                    <div class="nav-primary">
+                        <a href="{% url 'hostels:hostel_browse' %}" class="{% if request.path == '/hostels/browse/' %}active{% endif %}">🏨 Hostels</a>
+                        <a href="{% url 'hostels:room_list' %}" class="{% if request.path == '/hostels/' %}active{% endif %}">🛏️ Rooms</a>
+
+                        {% if is_student %}
+                            <a href="{% url 'bookings:recommendations' %}" class="{% if 'recommend' in request.path %}active{% endif %}">🤖 For You</a>
+                        {% endif %}
+
+                        {% if perms.bookings.change_booking %}
+                            <div class="nav-dropdown">
+                                <button type="button" class="nav-dropdown-toggle" aria-expanded="false">🧭 Staff <span class="nav-caret" aria-hidden="true">▾</span></button>
+                                <div class="nav-dropdown-menu">
+                                    <a href="{% url 'bookings:dashboard' %}" class="{% if 'dashboard' in request.path %}active{% endif %}">🧭 Dashboard</a>
+                                    <a href="{% url 'bookings:pending_bookings' %}" class="{% if 'pending' in request.path %}active{% endif %}">✅ Pending Requests</a>
+                                    <a href="{% url 'bookings:demand_forecast' %}" class="{% if 'demand-forecast' in request.path %}active{% endif %}">📈 Demand Forecast</a>
+                                    <a href="{% url 'bookings:recommendation_insights' %}" class="{% if 'recommendation-insights' in request.path %}active{% endif %}">📊 Recommendation Insights</a>
+                                    <a href="{% url 'bookings:message_hostel_list' %}" class="{% if 'staff/hostels' in request.path %}active{% endif %}">📢 Message a Hostel</a>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if perms.hostels.change_hostel or perms.hostels.change_term %}
+                            <div class="nav-dropdown">
+                                <button type="button" class="nav-dropdown-toggle" aria-expanded="false">⚙️ Admin <span class="nav-caret" aria-hidden="true">▾</span></button>
+                                <div class="nav-dropdown-menu">
+                                    {% if perms.hostels.change_hostel %}
+                                        <a href="{% url 'hostels:manage_hostels' %}" class="{% if '/hostels/manage' in request.path and 'terms' not in request.path %}active{% endif %}">🏢 Manage Hostels</a>
+                                    {% endif %}
+                                    {% if perms.hostels.change_term %}
+                                        <a href="{% url 'hostels:manage_terms' %}" class="{% if '/hostels/manage/terms' in request.path %}active{% endif %}">🗓️ Manage Terms</a>
+                                    {% endif %}
+                                    {% if user.is_staff %}<a href="{% url 'admin:index' %}">🛠️ Django Admin</a>{% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="nav-utility">
+                        {% if is_student %}
+                            <a class="nav-bell {% if 'notifications' in request.path %}active{% endif %}"
+                               href="{% url 'bookings:notifications' %}"
+                               aria-label="Notifications{% if unread_notification_count %} ({{ unread_notification_count }} unread){% endif %}">
+                                <span aria-hidden="true">🔔</span>
+                                {% if unread_notification_count %}<span class="badge badge-dot">{{ unread_notification_count }}</span>{% endif %}
+                            </a>
+                        {% endif %}
+
+                        <div class="nav-dropdown nav-dropdown-end">
+                            <button type="button" class="nav-dropdown-toggle nav-user-toggle" aria-expanded="false">
+                                <span class="nav-avatar" aria-hidden="true">{{ user.first_name|default:user.username|slice:":1"|upper }}</span>
+                                <span class="nav-user-name">{{ user.first_name|default:user.username }}</span>
+                                <span class="nav-caret" aria-hidden="true">▾</span>
+                            </button>
+                            <div class="nav-dropdown-menu">
+                                <div class="nav-dropdown-header">
+                                    <strong>{{ user.first_name|default:user.username }}</strong>
+                                    {% if user.profile.role %}<span>{{ user.profile.role }}</span>{% endif %}
+                                </div>
+                                <a href="{% url 'profile' %}" class="{% if request.path == '/profile/' %}active{% endif %}">👤 My Profile &amp; History</a>
+                                {% if is_student %}
+                                    <a href="{% url 'edit_preferences' %}" class="{% if 'preferences' in request.path %}active{% endif %}">🎯 My Preferences</a>
+                                {% endif %}
+                                <form action="{% url 'logout' %}" method="post" class="logout-form">
+                                    {% csrf_token %}
+                                    <button type="submit">🚪 Log out</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="nav-utility">
+                        <a href="{% url 'login' %}" class="btn btn-header">Log in</a>
+                    </div>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="site-main" id="main-content">
+        {% block breadcrumbs %}{% endblock %}
+
+        {% if messages %}
+            <div class="message-stack">
+                {% for message in messages %}
+                    <p class="message message-{{ message.tags }}">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="site-footer-inner">
+            <p>&copy; {% now "Y" %} Hostel Booking &middot; AI-Powered Hostel Booking &amp; Management System</p>
+            <p class="footer-credit">Zetech University final-year project</p>
+        </div>
+    </footer>
+
+    <script src="{% static 'js/nav.js' %}"></script>
+</body>
+</html>
